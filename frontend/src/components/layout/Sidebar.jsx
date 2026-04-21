@@ -35,6 +35,7 @@ const Sidebar = () => {
     const dsw = [
       { name: 'Analytics', path: '/analytics', icon: BarChart },
       { name: 'Booking Approvals', path: '/dsw/approvals', icon: CheckSquare },
+      { name: 'Manage Venues', path: '/admin/venues', icon: MapPin },
       { name: 'Logs', path: '/logs', icon: FileText },
     ];
 

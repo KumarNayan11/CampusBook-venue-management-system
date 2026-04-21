@@ -2,89 +2,164 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const Department = require('./models/Department');
 const Venue = require('./models/Venue');
-const bcrypt = require('bcryptjs');
+const Booking = require('./models/Booking');
 const dotenv = require('dotenv');
 
 dotenv.config();
 
 const seedData = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/venue-mgmt');
+    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/venue-mgmt';
+    await mongoose.connect(MONGO_URI);
     console.log('Connected to MongoDB for seeding...');
 
-    // Clear existing data
+    // 1. Clear existing data
+    console.log('Cleaning existing collections...');
     await User.deleteMany({});
     await Department.deleteMany({});
     await Venue.deleteMany({});
-    await require('./models/Booking').deleteMany({});
-    await require('./models/Timetable').deleteMany({});
+    await Booking.deleteMany({});
 
-    // Create Departments
-    const cseDept = await Department.create({ name: 'Computer Science' });
-    const eceDept = await Department.create({ name: 'Electronics & Communication' });
+    // 2. Create Departments
+    console.log('Creating departments...');
+    const depts = [
+      { name: 'Computer Science & Engineering' },
+      { name: 'Information Technology' },
+      { name: 'Electrical Engineering' },
+      { name: 'Mechanical Engineering' },
+      { name: 'Civil Engineering' }
+    ];
+    const createdDepts = await Department.insertMany(depts);
+    const cseDept = createdDepts[0];
+    const itDept = createdDepts[1];
 
-    // Create Admin
-    const admin = await User.create({
+    // 3. Create Users
+    console.log('Creating system accounts...');
+    
+    // Admin
+    await User.create({
       name: 'Super Admin',
-      email: 'admin@college.edu',
-      password: 'adminpassword',
+      email: 'admin@mits.edu',
+      password: 'admin123',
       role: 'admin',
     });
 
-    // Create DSW
-    const dsw = await User.create({
-      name: 'DSW Officer',
-      email: 'dsw@college.edu',
-      password: 'dswpassword',
+    // DSW
+    await User.create({
+      name: 'Dr. R.K. Gupta (DSW)',
+      email: 'dsw@mits.edu',
+      password: 'dsw123',
       role: 'dsw',
     });
 
-    // Create HOD
-    const hod = await User.create({
-      name: 'CSE HOD',
-      email: 'hod.cse@college.edu',
-      password: 'hodpassword',
+    // HODs
+    const hodCse = await User.create({
+      name: 'Dr. Manish Dixit',
+      email: 'hod.cse@mits.edu',
+      password: 'hod123',
       role: 'hod',
       departmentId: cseDept._id,
     });
     
-    cseDept.hodId = hod._id;
+    // Link HOD to Department
+    cseDept.hodId = hodCse._id;
     await cseDept.save();
 
-    // Create Faculty
-    const faculty = await User.create({
-      name: 'Dr. Smith',
-      email: 'smith@college.edu',
-      password: 'facultypassword',
+    // Faculty
+    await User.create({
+      name: 'Prof. Aditya Bansal',
+      email: 'faculty@mits.edu',
+      password: 'faculty123',
       role: 'faculty',
       departmentId: cseDept._id,
     });
 
-    // Create Venues
-    await Venue.create({
-      name: 'Auditorium',
-      type: 'central',
-      capacity: 500,
-      status: 'available'
-    });
+    // 4. Create Venues
+    console.log('Deploying campus infrastructure...');
+    
+    const venues = [
+      // Central Venues
+      {
+        name: 'Madanrao Scindia Auditorium (MAC)',
+        type: 'central',
+        capacity: 800,
+        location: 'Main Block, Ground Floor',
+        category: 'auditorium',
+        status: 'available',
+        booking_open_time: '09:00',
+        booking_close_time: '21:00'
+      },
+      {
+        name: 'Open Air Theatre (OAT)',
+        type: 'central',
+        capacity: 1500,
+        location: 'Near Hostel Block',
+        category: 'sports_facility',
+        status: 'available',
+        booking_open_time: '06:00',
+        booking_close_time: '22:00'
+      },
+      {
+        name: 'Central Seminar Hall 1',
+        type: 'central',
+        capacity: 200,
+        location: 'IT Block, 2nd Floor',
+        category: 'seminar_hall',
+        status: 'available',
+        booking_open_time: '08:00',
+        booking_close_time: '19:00'
+      },
+      // Departmental Venues (CSE)
+      {
+        name: 'CSE Seminar Hall (SH-1)',
+        type: 'departmental',
+        departmentId: cseDept._id,
+        capacity: 120,
+        location: 'CSE Block, 1st Floor',
+        category: 'seminar_hall',
+        status: 'available',
+        booking_open_time: '09:30',
+        booking_close_time: '17:30'
+      },
+      {
+        name: 'Advanced Computing Lab',
+        type: 'departmental',
+        departmentId: cseDept._id,
+        capacity: 60,
+        location: 'CSE Block, Lab Wing',
+        category: 'laboratory',
+        status: 'available',
+        booking_open_time: '09:30',
+        booking_close_time: '16:30'
+      },
+      // Departmental Venues (IT)
+      {
+        name: 'IT Smart Classroom (SC-1)',
+        type: 'departmental',
+        departmentId: itDept._id,
+        capacity: 70,
+        location: 'IT Block, 1st Floor',
+        category: 'classroom',
+        status: 'available',
+        booking_open_time: '08:00',
+        booking_close_time: '18:00'
+      }
+    ];
 
-    await Venue.create({
-      name: 'CSE Seminar Hall',
-      type: 'departmental',
-      departmentId: cseDept._id,
-      capacity: 100,
-      status: 'available'
-    });
+    await Venue.insertMany(venues);
 
-    console.log('Seeding complete! User logins:');
-    console.log('- Admin: admin@college.edu / adminpassword');
-    console.log('- HOD: hod.cse@college.edu / hodpassword');
-    console.log('- Faculty: smith@college.edu / facultypassword');
-    console.log('- DSW: dsw@college.edu / dswpassword');
+    console.log('\n✅ Seeding complete! Database ready.');
+    console.log('-----------------------------------');
+    console.log('Credentials:');
+    console.log('- Admin:    admin@mits.edu / admin123');
+    console.log('- DSW:      dsw@mits.edu / dsw123');
+    console.log('- CSE HOD:  hod.cse@mits.edu / hod123');
+    console.log('- Faculty:  faculty@mits.edu / faculty123');
+    console.log('-----------------------------------');
 
-    process.exit();
+    process.exit(0);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Error seeding database:', err);
     process.exit(1);
   }
 };

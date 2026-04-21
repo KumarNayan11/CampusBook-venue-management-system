@@ -110,10 +110,11 @@ const App = () => {
             </ProtectedRoute>
           } />
           <Route path="/admin/venues" element={
-            <ProtectedRoute roles={['admin']}>
+            <ProtectedRoute roles={['admin', 'dsw']}>
               <ManageVenues />
             </ProtectedRoute>
           } />
+
 
           {/* DSW Routes */}
           <Route path="/dsw/approvals" element={

@@ -79,10 +79,6 @@ const DSWDashboard = () => {
      toast.success('Central Logs Exported Successfully');
   };
 
-  const showAdminOnlyMessage = () => {
-     toast.error('Venue management is currently available to admins only.');
-  };
-
   const filteredBookings = (Array.isArray(centralBookings) ? centralBookings : []).filter(b => {
      if (!b) return false;
      const venue = b?.venue || '';
@@ -96,7 +92,7 @@ const DSWDashboard = () => {
   }).slice(0, 5);
 
   const metrics = [
-    { label: 'Total Venues', value: statsData?.totalVenues || '0', icon: Building2, color: 'text-blue-600', bg: 'bg-blue-50', path: '#' },
+    { label: 'Total Venues', value: statsData?.totalVenues || '0', icon: Building2, color: 'text-blue-600', bg: 'bg-blue-50', path: '/admin/venues' },
     { label: 'Pending DSW', value: statsData?.pendingBookings || '0', icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', path: '/dsw/approvals' },
     { label: 'Total Reservations', value: statsData?.totalBookings || '0', icon: CalendarCheck, color: 'text-emerald-600', bg: 'bg-emerald-50', path: '/logs' },
     { label: 'Approved', value: statsData?.approvedBookings || '0', icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-50', path: '#' },
@@ -127,7 +123,7 @@ const DSWDashboard = () => {
              Export Logs
           </button>
           <button 
-            onClick={showAdminOnlyMessage}
+            onClick={() => navigate('/admin/venues')}
             className="flex items-center px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 active:scale-95 text-sm uppercase tracking-wider"
           >
              Central Venues
