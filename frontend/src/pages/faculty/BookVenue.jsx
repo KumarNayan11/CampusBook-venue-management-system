@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Calendar, Clock, MapPin, Search, Filter, Info, CheckCircle2, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, Search, Filter, Info, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { getVenues } from '../../services/venueService';
 import { createBooking } from '../../services/bookingService';
 import useApi from '../../hooks/useApi';
@@ -77,7 +77,7 @@ const BookVenue = () => {
     try {
       const data = await request(() => getVenues());
       if (data) setVenues(data);
-    } catch (error) {
+    } catch (err) {
       // Error handled by useApi
     }
   };
@@ -86,7 +86,6 @@ const BookVenue = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Client-side booking hours validation
     if (selectedVenue?.booking_open_time && selectedVenue?.booking_close_time) {
       const open = selectedVenue.booking_open_time;
       const close = selectedVenue.booking_close_time;
@@ -107,7 +106,7 @@ const BookVenue = () => {
       toast.success('Booking request submitted! Waiting for approval.');
       setFormData({ bookingDate: '', startTime: '', endTime: '', purpose: '', requirements: '' });
       setSelectedVenue(null);
-    } catch (error) {
+    } catch (err) {
       // Error handled by useApi
     } finally {
       setIsSubmitting(false);

@@ -24,7 +24,7 @@ const Home = () => {
                totalBookings: data.totalBookings?.toString() || '0',
                totalUsers: data.totalUsers?.toString() || '0'
             });
-         } catch (error) {
+         } catch (err) {
             console.error('Landing stats sync failed');
          }
       };
@@ -227,7 +227,7 @@ const Home = () => {
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {roles.map((role, idx) => {
+                  {roles.map((role) => {
                      const Icon = role.icon;
                      return (
                         <div

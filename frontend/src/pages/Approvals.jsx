@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { 
-  CheckCircle, XCircle, Clock, Search, Filter, 
-  MapPin, User, ChevronRight, Check, X, ShieldCheck, Mail, RefreshCw
+  CheckCircle, Clock, 
+  MapPin, User, Check, X, ShieldCheck, Mail, RefreshCw
 } from 'lucide-react';
 import { getAllBookings, hodApprove, dswApprove, rejectBooking } from '../services/bookingService';
 import useApi from '../hooks/useApi';
@@ -27,7 +27,7 @@ const Approvals = ({ role = 'hod' }) => {
         return false;
       });
       setData(pending);
-    } catch (error) {
+    } catch (err) {
       // Handled by useApi toast
     }
   };
@@ -43,7 +43,7 @@ const Approvals = ({ role = 'hod' }) => {
       
       toast.success(`Booking ${action === 'approve' ? 'Approved' : 'Rejected'}`);
       setData(prev => prev.filter(item => item._id !== id));
-    } catch (error) {
+    } catch (err) {
       // Handled by useApi toast
     }
   };
@@ -76,11 +76,10 @@ const Approvals = ({ role = 'hod' }) => {
       </header>
 
       <div className="grid grid-cols-1 gap-6">
-        {data.map((item, idx) => (
+        {data.map((item) => (
           <div 
             key={item._id} 
             className="bg-white border border-slate-100 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 hover:shadow-blue-900/10 transition-all duration-500 overflow-hidden group p-8"
-            style={{ animationDelay: `${idx * 100}ms` }}
           >
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                <div className="flex-1 space-y-6">
