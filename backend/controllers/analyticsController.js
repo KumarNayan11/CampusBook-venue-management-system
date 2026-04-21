@@ -1,6 +1,7 @@
 const Venue = require('../models/Venue');
 const Booking = require('../models/Booking');
 const Department = require('../models/Department');
+const User = require('../models/User');
 
 exports.getOverallAnalytics = async (req, res) => {
   try {
@@ -191,6 +192,22 @@ exports.getDepartmentAnalytics = async (req, res) => {
       statusBreakdown,
       timeTrend,
       utilization
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getPublicStats = async (req, res) => {
+  try {
+    const totalVenues = await Venue.countDocuments();
+    const totalBookings = await Booking.countDocuments();
+    const totalUsers = await User.countDocuments();
+    
+    res.json({
+      totalVenues,
+      totalBookings,
+      totalUsers,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

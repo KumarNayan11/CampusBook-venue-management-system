@@ -23,10 +23,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear local storage and redirect to login if unauthorized
+      // Clear local storage on auth failure
       localStorage.removeItem('campusbook_token');
       localStorage.removeItem('campusbook_user');
-      window.location.href = '/login';
+      
+      // Only force redirect if we are strictly not already on accessible public routes
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login' && currentPath !== '/signup' && currentPath !== '/') {
+         window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

@@ -4,6 +4,7 @@ import {
   login as userServiceLogin, 
   register as userServiceRegister, 
   updateProfile as userServiceUpdateProfile,
+  getMe as userServiceGetMe,
   logout as userServiceLogout 
 } from '../services/userService';
 
@@ -20,24 +21,28 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Initialize Auth State from Local Storage
+  // Initialize Auth State from Local Storage and Verify Token
   useEffect(() => {
-    const token = localStorage.getItem('campusbook_token');
-    const storedUserStr = localStorage.getItem('campusbook_user');
-    
-    if (token && storedUserStr) {
-      try {
-        const storedUser = JSON.parse(storedUserStr);
-        if (storedUser) {
-          setUser(storedUser);
+    const verifyAuth = async () => {
+      const token = localStorage.getItem('campusbook_token');
+      
+      if (token) {
+        try {
+          const userProfile = await userServiceGetMe();
+          setUser(userProfile);
+          // Sync local storage user object just in case
+          localStorage.setItem('campusbook_user', JSON.stringify(userProfile));
+        } catch (err) {
+          console.error('Auth verification failed:', err);
+          localStorage.removeItem('campusbook_token');
+          localStorage.removeItem('campusbook_user');
+          setUser(null);
         }
-      } catch (err) {
-        console.error('Failed to parse stored user:', err);
-        localStorage.removeItem('campusbook_token');
-        localStorage.removeItem('campusbook_user');
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    verifyAuth();
   }, []);
 
   // Login handler

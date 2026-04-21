@@ -8,7 +8,7 @@ import {
   MapPin, 
   UserCircle,
   BarChart,
-  ArrowLeftRight,
+  LogOut,
   CalendarCheck2,
   FileText
 } from 'lucide-react';
@@ -62,17 +62,8 @@ const Sidebar = () => {
     return links;
   };
 
-  const handleSwitchRole = () => {
-    if (switchRole) {
-      const roles = ['admin', 'dsw', 'hod', 'faculty'];
-      const currentIndex = roles.indexOf(user?.role || 'faculty');
-      const nextRole = roles[(currentIndex + 1) % roles.length];
-      switchRole(nextRole);
-      navigate('/dashboard');
-    } else {
-      logout();
-      navigate('/');
-    }
+  const handleLogout = () => {
+    logout();
   };
 
   const navLinks = getNavLinks();
@@ -119,11 +110,11 @@ const Sidebar = () => {
           </div>
         </div>
         <button
-          onClick={handleSwitchRole}
-          className="flex items-center w-full px-4 py-2 mt-2 text-sm text-slate-400 hover:text-blue-400 transition-colors group"
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2 mt-2 text-sm text-slate-400 hover:text-rose-400 transition-colors group"
         >
-          <ArrowLeftRight className="w-4 h-4 mr-3" />
-          <span>Switch Role</span>
+          <LogOut className="w-4 h-4 mr-3" />
+          <span>Logout</span>
         </button>
       </div>
     </div>

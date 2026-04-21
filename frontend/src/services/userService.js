@@ -49,6 +49,11 @@ export const updateProfile = async (userData) => {
   return data;
 };
 
+export const getMe = async () => {
+  const { data } = await api.get('/auth/me');
+  return data;
+};
+
 export const logout = () => {
   localStorage.removeItem('campusbook_token');
   localStorage.removeItem('campusbook_user');

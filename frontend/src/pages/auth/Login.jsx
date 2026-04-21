@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -28,9 +28,16 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-slate-50 selection:bg-blue-100 selection:text-blue-700">
-      <div className="w-full max-w-md p-10 bg-white border border-slate-100 rounded-3xl shadow-2xl shadow-blue-900/5 transition-all duration-500 scale-100 hover:shadow-blue-900/10 hover:border-blue-500/20 group">
-        <div className="mb-10 text-center">
+    <div className="flex flex-col min-h-screen p-6 bg-slate-50 selection:bg-blue-100 selection:text-blue-700">
+      <div className="w-full max-w-7xl mx-auto mb-4 md:mb-8">
+        <Link to="/" className="inline-flex items-center text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors uppercase tracking-widest">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Home
+        </Link>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center pb-12">
+        <div className="w-full max-w-md p-10 bg-white border border-slate-100 rounded-3xl shadow-2xl shadow-blue-900/5 transition-all duration-500 scale-100 hover:shadow-blue-900/10 hover:border-blue-500/20 group">
+          <div className="mb-10 text-center">
           <div className="inline-flex items-center justify-center h-16 w-16 mb-4 rounded-3xl bg-gradient-to-tr from-blue-600 to-sky-400 p-[2px] shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/40 group-hover:-translate-y-1 transition-all duration-300">
             <div className="w-full h-full rounded-3xl bg-white flex items-center justify-center overflow-hidden">
               <div className="h-8 w-8 bg-blue-600 rounded-lg transform rotate-45 flex items-center justify-center">
@@ -114,6 +121,7 @@ const Login = () => {
       <div className="mt-8 flex space-x-6 text-xs font-bold text-slate-400 tracking-widest uppercase opacity-50 hover:opacity-100 transition-opacity">
         <a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a>
         <a href="#" className="hover:text-blue-600 transition-colors">Terms of Service</a>
+      </div>
       </div>
     </div>
   );
