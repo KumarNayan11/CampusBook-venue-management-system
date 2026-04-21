@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Mail, Lock, User, Briefcase, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, Lock, User, Briefcase, CheckCircle2, ArrowLeft, Building2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { getDepartments } from '../../services/departmentService';
 import toast from 'react-hot-toast';
 
 const Signup = () => {
@@ -12,10 +13,23 @@ const Signup = () => {
     role: 'faculty',
     department: ''
   });
+  const [departments, setDepartments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDepts = async () => {
+      try {
+        const data = await getDepartments();
+        setDepartments(data);
+      } catch (err) {
+        console.error('Failed to fetch departments');
+      }
+    };
+    fetchDepts();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -100,6 +114,7 @@ const Signup = () => {
               </span>
               <select
                 name="role"
+                value={formData.role}
                 className="w-full py-3.5 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900 appearance-none bg-no-repeat bg-[right_1rem_center]"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")` }}
                 onChange={handleChange}
@@ -113,23 +128,30 @@ const Signup = () => {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="block pl-1 text-sm font-bold text-slate-700 tracking-tight">Department</label>
-            <div className="relative group/input">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within/input:text-blue-600 transition-colors">
-                 <div className="h-4 w-4 bg-blue-100 rounded flex items-center justify-center">
-                    <div className="h-2 w-2 bg-blue-600 rounded-full"></div>
-                 </div>
-              </span>
-              <input
-                name="department"
-                type="text"
-                className="w-full py-3.5 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900 placeholder:text-slate-400"
-                placeholder="e.g. Computer Science"
-                onChange={handleChange}
-              />
+          {['faculty', 'hod'].includes(formData.role) && (
+            <div className="space-y-1.5">
+              <label className="block pl-1 text-sm font-bold text-slate-700 tracking-tight">Department</label>
+              <div className="relative group/input">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within/input:text-blue-600 transition-colors">
+                  <Building2 className="w-4 h-4" />
+                </span>
+                <select
+                  name="department"
+                  value={formData.department}
+                  className="w-full py-3.5 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-900 appearance-none bg-no-repeat bg-[right_1rem_center]"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E")` }}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((dept) => (
+                    <option key={dept._id} value={dept.name}>{dept.name}</option>
+                  ))}
+                  {departments.length === 0 && <option value="General">General</option>}
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="md:col-span-2 space-y-1.5">
             <label className="block pl-1 text-sm font-bold text-slate-700 tracking-tight">Access Password</label>

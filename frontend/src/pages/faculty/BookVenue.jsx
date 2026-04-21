@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { Calendar, Clock, MapPin, Search, Filter, Info, AlertCircle, ArrowRight, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, MapPin, Search, Filter, Info, AlertCircle, ArrowRight, RefreshCw, Building2 } from 'lucide-react';
 import { getVenues } from '../../services/venueService';
 import { createBooking } from '../../services/bookingService';
 import useApi from '../../hooks/useApi';
@@ -192,6 +192,10 @@ const BookVenue = () => {
                       {venue.location || 'Campus Center'}
                     </p>
                     <p className="flex items-center text-sm font-medium text-slate-500 italic">
+                      <Building2 className="w-4 h-4 mr-2 text-blue-500" />
+                      {venue.type === 'central' ? 'Campus Wide' : (venue.departmentId?.name || 'Departmental')}
+                    </p>
+                    <p className="flex items-center text-sm font-medium text-slate-500 italic">
                       <span className="w-4 h-4 mr-2 flex items-center justify-center font-bold text-xs text-blue-500">👨‍👩‍👧‍👦</span>
                       Capacity: {venue.capacity} People
                     </p>
@@ -283,6 +287,5 @@ const BookVenue = () => {
     </div>
   );
 };
-
 
 export default BookVenue;
