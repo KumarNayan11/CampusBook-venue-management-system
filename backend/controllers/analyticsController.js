@@ -107,7 +107,6 @@ exports.getDepartmentAnalytics = async (req, res) => {
   try {
     const departmentId = req.user.departmentId;
     
-    // 1. Find venues with departmentId (Auth check prevents this being null normally)
     const venues = await Venue.find({ departmentId }).select('_id name booking_open_time booking_close_time');
     const venueIds = venues.map(v => v._id);
 
@@ -116,7 +115,6 @@ exports.getDepartmentAnalytics = async (req, res) => {
     const pendingBookings = await Booking.countDocuments({ venueId: { $in: venueIds }, status: 'pending_hod' });
     const approvedBookings = await Booking.countDocuments({ venueId: { $in: venueIds }, status: 'approved' });
 
-    // 2. Bookings by Venue
     const bookingsByVenueRaw = await Booking.aggregate([
       { $match: { venueId: { $in: venueIds } } },
       { $lookup: { from: 'venues', localField: 'venueId', foreignField: '_id', as: 'venue' } },
@@ -127,14 +125,12 @@ exports.getDepartmentAnalytics = async (req, res) => {
     ]);
     const topVenues = bookingsByVenueRaw.slice(0, 3);
 
-    // 3. Status Breakdown
     const statusBreakdown = await Booking.aggregate([
       { $match: { venueId: { $in: venueIds } } },
       { $group: { _id: '$status', value: { $sum: 1 } } },
       { $project: { name: '$_id', value: 1, _id: 0 } }
     ]);
 
-    // 4. Time Trend
     const timeTrend = [];
     const deptBookings = await Booking.find({ venueId: { $in: venueIds } }).select('date startTime endTime venueId');
     const monthCounts = {};
@@ -149,7 +145,6 @@ exports.getDepartmentAnalytics = async (req, res) => {
        if(monthCounts[i] > 0) timeTrend.push({ name: monthNames[i], bookings: monthCounts[i] });
     }
 
-    // 5. Utilization
     const venueStats = {};
     deptBookings.forEach(b => {
       const v = venues.find(ven => ven._id.toString() === b.venueId.toString());
@@ -185,7 +180,7 @@ exports.getDepartmentAnalytics = async (req, res) => {
       totalVenues,
       totalBookings,
       approvedBookings,
-      pendingApproval: pendingBookings, // some old UI uses this alias
+      pendingApproval: pendingBookings,
       pendingBookings,
       bookingsByVenue: bookingsByVenueRaw,
       topVenues,
@@ -200,6 +195,13 @@ exports.getDepartmentAnalytics = async (req, res) => {
 
 exports.getPublicStats = async (req, res) => {
   try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+       return res.status(503).json({ 
+         message: 'Database not connected. Check Atlas IP whitelist (0.0.0.0/0) and MONGO_URI.' 
+       });
+    }
+
     const totalVenues = await Venue.countDocuments();
     const totalBookings = await Booking.countDocuments();
     const totalUsers = await User.countDocuments();
@@ -210,6 +212,9 @@ exports.getPublicStats = async (req, res) => {
       totalUsers,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ 
+      message: 'Server Error: ' + error.message,
+      tip: 'This indicates a database failure. Ensure MONGO_URI is correct and IP Whitelist is set.'
+    });
   }
 };
