@@ -7,11 +7,17 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 const app = express();
 
-// Security Middleware
-app.use(helmet({
-  contentSecurityPolicy: false,
-}));
+// Trust Vercel proxy (important for rate limiting and correct IP detection)
+app.set('trust proxy', 1);
 
+// Security Middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
+
+// Rate limiter for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -22,6 +28,11 @@ const authLimiter = rateLimit({
 app.use(cors());
 app.use(express.json());
 app.use(logger);
+
+// Health check route (useful for deployment verification)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Apply rate limiter to auth routes
 app.use('/api/auth', authLimiter);
@@ -46,8 +57,6 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/config', configRoutes);
-
-
 
 // Error handling middleware
 app.use(notFound);

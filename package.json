@@ -1,20 +1,28 @@
 {
-  "name": "venue-mgmt-system",
+  "name": "campusbook-venue-management",
   "version": "1.0.0",
-  "description": "Integrated Venue Management System",
+  "description": "Integrated Venue Management System for CampusBook",
   "private": true,
   "workspaces": [
     "backend",
     "frontend"
   ],
   "scripts": {
+    "setup": "npm install && npm install --workspace=backend && npm install --workspace=frontend",
+    "dev-backend": "npm run dev --workspace=backend",
+    "dev-frontend": "npm run dev --workspace=frontend",
+    "dev": "npm run dev-backend",
     "build": "npm run build --workspace=frontend",
-    "build-frontend": "npm run build --workspace=frontend",
-    "seed": "npm run seed --workspace=backend",
     "start": "npm start --workspace=backend",
-    "dev": "npm run dev --workspace=backend"
+    "seed": "npm run seed --workspace=backend",
+    "test": "npm test --workspace=backend"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "mern",
+    "venue-management",
+    "react",
+    "node"
+  ],
+  "author": "KumarNayan11",
   "license": "ISC"
 }
