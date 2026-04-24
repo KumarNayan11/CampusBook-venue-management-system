@@ -7,12 +7,13 @@ exports.getOverallAnalytics = async (req, res) => {
   try {
     const totalVenues = await Venue.countDocuments();
     const activeMaintenance = await Venue.countDocuments({ status: 'maintenance' });
-    const totalBookings = await Booking.countDocuments();
+    const totalBookings = await Booking.countDocuments({ status: { $ne: 'withdrawn' } });
     const approvedBookings = await Booking.countDocuments({ status: 'approved' });
     const pendingBookings = await Booking.countDocuments({ status: { $in: ['pending_hod', 'pending_dsw'] } });
 
-    // 1. Bookings by Department
+    // 1. Bookings by Department (Excluding withdrawn)
     const bookingsByDepartmentRaw = await Booking.aggregate([
+      { $match: { status: { $ne: 'withdrawn' } } },
       { $lookup: { from: 'venues', localField: 'venueId', foreignField: '_id', as: 'venue' } },
       { $unwind: '$venue' },
       { $lookup: { from: 'departments', localField: 'venue.departmentId', foreignField: '_id', as: 'dept' } },
@@ -22,8 +23,9 @@ exports.getOverallAnalytics = async (req, res) => {
       { $sort: { count: -1 } }
     ]);
 
-    // 2. Bookings by Venue & Top 3 Venues
+    // 2. Bookings by Venue & Top 3 Venues (Excluding withdrawn)
     const bookingsByVenue = await Booking.aggregate([
+      { $match: { status: { $ne: 'withdrawn' } } },
       { $lookup: { from: 'venues', localField: 'venueId', foreignField: '_id', as: 'venue' } },
       { $unwind: '$venue' },
       { $group: { _id: '$venue.name', count: { $sum: 1 } } },
@@ -32,15 +34,15 @@ exports.getOverallAnalytics = async (req, res) => {
     ]);
     const topVenues = bookingsByVenue.slice(0, 3);
 
-    // 3. Status Breakdown
+    // 3. Status Breakdown (Include all for transparency)
     const statusBreakdown = await Booking.aggregate([
       { $group: { _id: '$status', value: { $sum: 1 } } },
       { $project: { name: '$_id', value: 1, _id: 0 } }
     ]);
 
-    // 4. Booking Time Trend (simplified to JS for safe parsing of date strings if any)
+    // 4. Booking Time Trend (Excluding withdrawn)
     const timeTrend = [];
-    const bookings = await Booking.find().select('date');
+    const bookings = await Booking.find({ status: { $ne: 'withdrawn' } }).select('date');
     const monthCounts = {};
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     bookings.forEach(b => {
@@ -53,8 +55,8 @@ exports.getOverallAnalytics = async (req, res) => {
        if(monthCounts[i] > 0) timeTrend.push({ name: monthNames[i], bookings: monthCounts[i] });
     }
 
-    // 5. Venue Utilization
-    const allBookings = await Booking.find().populate('venueId');
+    // 5. Venue Utilization (Excluding withdrawn)
+    const allBookings = await Booking.find({ status: { $ne: 'withdrawn' } }).populate('venueId');
     const venueStats = {};
     allBookings.forEach(b => {
       const v = b.venueId;
@@ -111,12 +113,12 @@ exports.getDepartmentAnalytics = async (req, res) => {
     const venueIds = venues.map(v => v._id);
 
     const totalVenues = venues.length;
-    const totalBookings = await Booking.countDocuments({ venueId: { $in: venueIds } });
+    const totalBookings = await Booking.countDocuments({ venueId: { $in: venueIds }, status: { $ne: 'withdrawn' } });
     const pendingBookings = await Booking.countDocuments({ venueId: { $in: venueIds }, status: 'pending_hod' });
     const approvedBookings = await Booking.countDocuments({ venueId: { $in: venueIds }, status: 'approved' });
 
     const bookingsByVenueRaw = await Booking.aggregate([
-      { $match: { venueId: { $in: venueIds } } },
+      { $match: { venueId: { $in: venueIds }, status: { $ne: 'withdrawn' } } },
       { $lookup: { from: 'venues', localField: 'venueId', foreignField: '_id', as: 'venue' } },
       { $unwind: '$venue' },
       { $group: { _id: '$venue.name', count: { $sum: 1 } } },
@@ -132,7 +134,10 @@ exports.getDepartmentAnalytics = async (req, res) => {
     ]);
 
     const timeTrend = [];
-    const deptBookings = await Booking.find({ venueId: { $in: venueIds } }).select('date startTime endTime venueId');
+    const deptBookings = await Booking.find({ 
+      venueId: { $in: venueIds }, 
+      status: { $ne: 'withdrawn' } 
+    }).select('date startTime endTime venueId');
     const monthCounts = {};
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     deptBookings.forEach(b => {
@@ -203,7 +208,7 @@ exports.getPublicStats = async (req, res) => {
     }
 
     const totalVenues = await Venue.countDocuments();
-    const totalBookings = await Booking.countDocuments();
+    const totalBookings = await Booking.countDocuments({ status: { $ne: 'withdrawn' } });
     const totalUsers = await User.countDocuments();
     
     res.json({

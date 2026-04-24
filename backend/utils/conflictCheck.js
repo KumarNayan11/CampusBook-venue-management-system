@@ -1,5 +1,4 @@
 const Booking = require('../models/Booking');
-const Timetable = require('../models/Timetable');
 const moment = require('moment');
 
 /**
@@ -20,7 +19,7 @@ const isOverlapping = (start1, end1, start2, end2) => {
 };
 
 /**
- * Checks for booking conflicts with existing approved reservations and the academic timetable.
+ * Checks for booking conflicts with existing approved reservations.
  */
 const checkConflicts = async (venueId, date, startTime, endTime) => {
   // 1. Normalize input times
@@ -38,25 +37,7 @@ const checkConflicts = async (venueId, date, startTime, endTime) => {
     if (isOverlapping(normalizedStart, normalizedEnd, booking.startTime, booking.endTime)) {
       return { 
         conflict: true, 
-        reason: `Slot partially occupied by an approved booking (${booking.startTime} - ${booking.endTime}).` 
-      };
-    }
-  }
-
-  // 3. Check against Academic Timetable
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const bookingDay = days[new Date(date).getDay()];
-
-  const timetableSchedules = await Timetable.find({
-    venueId,
-    day: { $regex: new RegExp(`^${bookingDay}$`, 'i') } // Case-insensitive day match
-  });
-
-  for (const schedule of timetableSchedules) {
-    if (isOverlapping(normalizedStart, normalizedEnd, schedule.startTime, schedule.endTime)) {
-      return { 
-        conflict: true, 
-        reason: `Scheduled Academic Activity: ${schedule.subject} (${schedule.startTime} - ${schedule.endTime}).` 
+        reason: `Slot partially occupied by another booking (${booking.startTime} - ${booking.endTime}).` 
       };
     }
   }

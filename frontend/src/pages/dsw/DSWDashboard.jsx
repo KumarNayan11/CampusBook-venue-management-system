@@ -143,10 +143,7 @@ const DSWDashboard = () => {
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">{metric.label}</p>
                 <h3 className="text-3xl font-extrabold text-slate-900">{metric.value}</h3>
-                <div className="mt-4 flex items-center text-xs font-bold text-emerald-500 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100">
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  +12.5%
-                </div>
+
               </div>
               <div className={`p-4 rounded-3xl ${metric.bg} ${metric.color} group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
                 <metric.icon className="w-7 h-7" />

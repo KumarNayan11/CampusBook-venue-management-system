@@ -14,7 +14,7 @@ const FacultyDashboard = () => {
   const { loading, request } = useApi();
 
   const [stats, setStats] = useState({ approved: 0, pending: 0, total: 0 });
-  const [activeSpot, setActiveSpot] = useState(null);
+  const [activeSpots, setActiveSpots] = useState([]);
 
   const chartData = [
     { name: 'Approved', count: stats.approved },
@@ -46,9 +46,25 @@ const FacultyDashboard = () => {
           const pending = bookings.filter(b => b.status.startsWith('pending')).length;
           setStats({ approved, pending, total: bookings.length });
 
-          // Find an active spot (first approved booking today or next)
-          const liveSpot = formatted.find(b => b.status === 'APPROVED');
-          if (liveSpot) setActiveSpot(liveSpot);
+          // Find an active spot (closest upcoming approved booking)
+          const now = new Date();
+          now.setHours(0,0,0,0);
+          
+          const approvedBookings = bookings
+            .filter(b => b.status === 'approved')
+            .map(b => ({ ...b, dateObj: new Date(b.date) }))
+            .filter(b => b.dateObj >= now)
+            .sort((a, b) => a.dateObj - b.dateObj); // Closest first
+
+          if (approvedBookings.length > 0) {
+            const mappedSpots = approvedBookings.map(bestMatch => ({
+              venue: bestMatch.venueId?.name || 'Unknown Venue',
+              date: new Date(bestMatch.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              time: `${bestMatch.startTime} - ${bestMatch.endTime}`,
+              status: 'APPROVED'
+            }));
+            setActiveSpots(mappedSpots);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch dashboard data', error);
@@ -123,20 +139,34 @@ const FacultyDashboard = () => {
          <div className="space-y-6">
             <div className="p-8 bg-slate-900 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group h-full flex flex-col justify-between">
                 <div>
-                  <h4 className="text-3xl font-extrabold mb-2 italic">Active Spot</h4>
+                  <h4 className="text-3xl font-extrabold mb-2 italic">Active Spots</h4>
                   <p className="text-slate-400 font-bold uppercase tracking-widest text-xs mb-8">
-                    {activeSpot ? `${activeSpot.venue} (Confirmed)` : 'No Active Sessions'}
+                    {activeSpots.length > 0 ? `${activeSpots.length} Confirmed Sessions` : 'No Active Sessions'}
                   </p>
                   
-                  {activeSpot ? (
-                    <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-5 rounded-2xl group-hover:bg-white/10 transition-all duration-500">
-                      <div className="h-10 w-10 bg-blue-600/20 rounded-xl flex items-center justify-center text-blue-400 border border-blue-500/20">
-                          <Clock className="w-5 h-5" />
-                      </div>
-                      <div>
-                          <p className="text-sm font-bold">{activeSpot.time}</p>
-                          <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Scheduled Session</p>
-                      </div>
+                  {activeSpots.length > 0 ? (
+                    <div className="space-y-6 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+                      {activeSpots.map((spot, idx) => (
+                        <div key={idx} className="space-y-3 p-5 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all duration-500 group/card">
+                          <div className="flex items-center gap-3 mb-2">
+                             <div className="h-8 w-8 bg-indigo-600/20 rounded-lg flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                                <MapPin className="w-4 h-4" />
+                             </div>
+                             <p className="text-xs font-extrabold uppercase tracking-tight text-white group-hover/card:text-indigo-400 transition-colors">{spot.venue}</p>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="flex items-center gap-3 bg-white/5 p-2.5 rounded-xl">
+                              <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                              <p className="text-[10px] font-bold">{spot.date}</p>
+                            </div>
+                            <div className="flex items-center gap-3 bg-white/5 p-2.5 rounded-xl">
+                              <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                              <p className="text-[10px] font-bold">{spot.time}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="p-8 border border-dashed border-white/10 rounded-2xl text-center">
@@ -149,7 +179,7 @@ const FacultyDashboard = () => {
                <div className="pt-8">
                   <div className="flex items-center mb-6">
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-                        {activeSpot ? 'Platform handshake verified' : 'System idle'}
+                        {activeSpots.length > 0 ? 'Platform handshake verified' : 'System idle'}
                      </span>
                   </div>
                   <button 
@@ -175,7 +205,7 @@ const FacultyDashboard = () => {
                </button>
             </div>
          </div>
-         <BookingTable bookings={recentBookings} />
+         <BookingTable bookings={recentBookings} hideApplicant={true} />
       </div>
     </div>
   );

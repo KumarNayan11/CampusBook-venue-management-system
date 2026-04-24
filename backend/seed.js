@@ -23,22 +23,21 @@ const seedData = async () => {
     // 2. Create Departments
     console.log('Creating departments...');
     const depts = [
-      { name: 'Computer Science & Engineering' },
+      { name: 'Computer Science' },
       { name: 'Information Technology' },
-      { name: 'Electrical Engineering' },
-      { name: 'Mechanical Engineering' },
-      { name: 'Civil Engineering' }
+      { name: 'Electronics & Communication' }
     ];
     const createdDepts = await Department.insertMany(depts);
-    const cseDept = createdDepts[0];
+    const csDept = createdDepts[0];
     const itDept = createdDepts[1];
+    const ecDept = createdDepts[2];
 
     // 3. Create Users
     console.log('Creating system accounts...');
     
     // Admin
     await User.create({
-      name: 'Super Admin',
+      name: 'System Admin',
       email: 'admin@mits.edu',
       password: 'admin123',
       role: 'admin',
@@ -46,103 +45,73 @@ const seedData = async () => {
 
     // DSW
     await User.create({
-      name: 'Dr. R.K. Gupta (DSW)',
+      name: 'DSW Officer',
       email: 'dsw@mits.edu',
       password: 'dsw123',
       role: 'dsw',
     });
 
-    // HODs
-    const hodCse = await User.create({
-      name: 'Dr. Manish Dixit',
-      email: 'hod.cse@mits.edu',
+    // HODs (Created without departmentId per user request for manual assignment)
+    await User.create({
+      name: 'HOD Computer Science',
+      email: 'hod.cs@mits.edu',
       password: 'hod123',
-      role: 'hod',
-      departmentId: cseDept._id,
+      role: 'hod'
     });
-    
-    // Link HOD to Department
-    cseDept.hodId = hodCse._id;
-    await cseDept.save();
+
+    await User.create({
+      name: 'HOD Information Technology',
+      email: 'hod.it@mits.edu',
+      password: 'hod123',
+      role: 'hod'
+    });
 
     // Faculty
     await User.create({
-      name: 'Prof. Aditya Bansal',
+      name: 'Faculty User',
       email: 'faculty@mits.edu',
       password: 'faculty123',
       role: 'faculty',
-      departmentId: cseDept._id,
+      departmentId: csDept._id // Assigning to CS for immediate functionality
     });
 
-    // 4. Create Venues
+    // 4. Create Sample Venues
     console.log('Deploying campus infrastructure...');
     
     const venues = [
       // Central Venues
       {
-        name: 'Madanrao Scindia Auditorium (MAC)',
+        name: 'Main Auditorium',
         type: 'central',
-        capacity: 800,
-        location: 'Main Block, Ground Floor',
+        capacity: 500,
+        location: 'Admin Block',
         category: 'auditorium',
         status: 'available',
         booking_open_time: '09:00',
-        booking_close_time: '21:00'
+        booking_close_time: '18:00'
       },
+      // Departmental Venues
       {
-        name: 'Open Air Theatre (OAT)',
-        type: 'central',
-        capacity: 1500,
-        location: 'Near Hostel Block',
-        category: 'sports_facility',
-        status: 'available',
-        booking_open_time: '06:00',
-        booking_close_time: '22:00'
-      },
-      {
-        name: 'Central Seminar Hall 1',
-        type: 'central',
-        capacity: 200,
-        location: 'IT Block, 2nd Floor',
+        name: 'CS Seminar Hall',
+        type: 'departmental',
+        departmentId: csDept._id,
+        capacity: 100,
+        location: 'CS Block',
         category: 'seminar_hall',
         status: 'available',
-        booking_open_time: '08:00',
-        booking_close_time: '19:00'
-      },
-      // Departmental Venues (CSE)
-      {
-        name: 'CSE Seminar Hall (SH-1)',
-        type: 'departmental',
-        departmentId: cseDept._id,
-        capacity: 120,
-        location: 'CSE Block, 1st Floor',
-        category: 'seminar_hall',
-        status: 'available',
-        booking_open_time: '09:30',
-        booking_close_time: '17:30'
+        booking_open_time: '10:00',
+        booking_close_time: '16:00'
       },
       {
-        name: 'Advanced Computing Lab',
-        type: 'departmental',
-        departmentId: cseDept._id,
-        capacity: 60,
-        location: 'CSE Block, Lab Wing',
-        category: 'laboratory',
-        status: 'available',
-        booking_open_time: '09:30',
-        booking_close_time: '16:30'
-      },
-      // Departmental Venues (IT)
-      {
-        name: 'IT Smart Classroom (SC-1)',
+        name: 'IT Lab 1',
         type: 'departmental',
         departmentId: itDept._id,
-        capacity: 70,
-        location: 'IT Block, 1st Floor',
-        category: 'classroom',
+        capacity: 50,
+        location: 'IT Block',
+        category: 'laboratory',
         status: 'available',
-        booking_open_time: '08:00',
-        booking_close_time: '18:00'
+        booking_open_time: '09:00',
+        booking_close_time: '17:00'
       }
     ];
 
@@ -150,12 +119,14 @@ const seedData = async () => {
 
     console.log('\n✅ Seeding complete! Database ready.');
     console.log('-----------------------------------');
-    console.log('Credentials:');
+    console.log('Account Credentials:');
     console.log('- Admin:    admin@mits.edu / admin123');
     console.log('- DSW:      dsw@mits.edu / dsw123');
-    console.log('- CSE HOD:  hod.cse@mits.edu / hod123');
+    console.log('- CS HOD:   hod.cs@mits.edu / hod123');
+    console.log('- IT HOD:   hod.it@mits.edu / hod123');
     console.log('- Faculty:  faculty@mits.edu / faculty123');
     console.log('-----------------------------------');
+    console.log('Note: HOD accounts created. Assign them to departments in the Admin Panel.');
 
     process.exit(0);
   } catch (err) {

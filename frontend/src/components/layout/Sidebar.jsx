@@ -10,7 +10,8 @@ import {
   BarChart,
   LogOut,
   CalendarCheck2,
-  FileText
+  FileText,
+  GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -29,6 +30,7 @@ const Sidebar = () => {
       { name: 'Analytics', path: '/analytics', icon: BarChart },
       { name: 'Manage Users', path: '/admin/users', icon: Users },
       { name: 'Manage Venues', path: '/admin/venues', icon: MapPin },
+      { name: 'Departments', path: '/admin/departments', icon: GraduationCap },
       { name: 'Logs', path: '/logs', icon: FileText },
     ];
 

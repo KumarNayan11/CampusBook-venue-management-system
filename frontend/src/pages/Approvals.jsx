@@ -5,27 +5,52 @@ import {
   MapPin, User, Check, X, ShieldCheck, Mail, RefreshCw
 } from 'lucide-react';
 import { getAllBookings, hodApprove, dswApprove, rejectBooking } from '../services/bookingService';
+import { useAuth } from '../context/AuthContext';
 import useApi from '../hooks/useApi';
 
 const Approvals = ({ role = 'hod' }) => {
   const [data, setData] = useState([]);
   const { loading, request } = useApi();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchPendingBookings();
-  }, [role]);
+  }, [role, user]);
 
   const fetchPendingBookings = async () => {
     try {
       const bookings = await request(() => getAllBookings());
       if (!bookings) return;
       
-      // Filter based on role
-      const pending = bookings.filter(b => {
+      // Filter by approval stage
+      let pending = bookings.filter(b => {
         if (role === 'hod') return b.status === 'pending_hod';
         if (role === 'dsw') return b.status === 'pending_dsw';
         return false;
       });
+
+      // HOD only sees bookings for venues belonging to their own department.
+      // Uses live venueId.departmentId first; falls back to snapshot.departmentId
+      // so the queue works even if the venue has been deleted.
+      if (role === 'hod' && user?.departmentId) {
+        const hodDeptId = (
+          typeof user.departmentId === 'object'
+            ? user.departmentId._id
+            : user.departmentId
+        )?.toString();
+
+        pending = pending.filter(b => {
+          const liveDeptId = (
+            typeof b.venueId?.departmentId === 'object'
+              ? b.venueId?.departmentId?._id
+              : b.venueId?.departmentId
+          )?.toString();
+          const snapshotDeptId = b.snapshot?.departmentId?.toString();
+          const deptId = liveDeptId || snapshotDeptId;
+          return deptId && deptId === hodDeptId;
+        });
+      }
+
       setData(pending);
     } catch (err) {
       // Handled by useApi toast
@@ -88,10 +113,19 @@ const Approvals = ({ role = 'hod' }) => {
                         <MapPin className="w-8 h-8" />
                      </div>
                      <div>
-                        <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase italic leading-none mb-2">{item.venueId?.name || 'Central Venue'}</h3>
+                        {/* Snapshot fallback so the card stays readable if the venue is deleted */}
+                        <h3 className="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors uppercase italic leading-none mb-2">
+                          {item.venueId?.name || item.snapshot?.venueName || 'Venue'}
+                        </h3>
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center italic">
                            {new Date(item.date).toDateString()} | {item.startTime} - {item.endTime}
                         </p>
+                        {/* Show dept tag for context */}
+                        {(item.venueId?.departmentId?.name || item.snapshot?.departmentName) && (
+                          <span className="mt-1 inline-block px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-widest italic">
+                            {item.venueId?.departmentId?.name || item.snapshot?.departmentName}
+                          </span>
+                        )}
                      </div>
                   </div>
 
@@ -102,11 +136,16 @@ const Approvals = ({ role = 'hod' }) => {
                         </div>
                         <div>
                            <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic leading-none mb-1">Applicant Reference</p>
-                           <p className="text-sm font-bold text-slate-700 leading-none">{item.userId?.name || 'Unknown Faculty'}</p>
-                           <p className="text-[9px] font-bold text-slate-400 italic mt-1">{item.userId?.email || 'N/A'}</p>
+                           {/* Snapshot fallback for user name/email */}
+                           <p className="text-sm font-bold text-slate-700 leading-none">
+                             {item.userId?.name || item.snapshot?.userName || 'Unknown Faculty'}
+                           </p>
+                           <p className="text-[9px] font-bold text-slate-400 italic mt-1">
+                             {item.userId?.email || item.snapshot?.userEmail || 'N/A'}
+                           </p>
                         </div>
                      </div>
-                     <div className="flex gap-4">
+                      <div className="flex gap-4">
                         <div className="h-10 w-10 bg-white rounded-2xl flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
                            <Mail className="w-5 h-5" />
                         </div>
@@ -115,13 +154,22 @@ const Approvals = ({ role = 'hod' }) => {
                            <p className="text-xs font-bold text-slate-700 italic">{item.purpose}</p>
                         </div>
                      </div>
+                     <div className="flex gap-4">
+                        <div className="h-10 w-10 bg-white rounded-2xl flex items-center justify-center text-emerald-400 shadow-sm border border-slate-100">
+                           <ShieldCheck className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                           <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic leading-none mb-1">Special Requirements</p>
+                           <p className="text-xs font-bold text-slate-700 italic">{item.requirements || 'None'}</p>
+                        </div>
+                     </div>
                   </div>
                </div>
 
                <div className="flex items-center gap-4 border-l-2 border-slate-50 pl-0 lg:pl-10 h-full">
                   <button 
                     onClick={() => handleAction(item._id, 'reject')}
-                    className="flex-1 lg:flex-none h-16 w-16 bg-white border border-slate-200 text-rose-500 rounded-3xl hover:bg-rose-50 hover:border-rose-200 transition-all shadow-xl shadow-rose-900/5 active:scale-95 flex items-center justify-center shadow-rose-500/5"
+                    className="flex-1 lg:flex-none h-16 w-16 bg-white border border-slate-200 text-rose-500 rounded-3xl hover:bg-rose-50 hover:border-rose-200 transition-all shadow-xl shadow-rose-900/5 active:scale-95 flex items-center justify-center"
                   >
                      <X className="w-8 h-8" />
                   </button>

@@ -1,33 +1,15 @@
 import React from 'react';
-import { Search, User, ChevronDown, Menu } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { User, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import NotificationTray from './NotificationTray';
 
 const Navbar = () => {
   const { user } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const showSearch = location.pathname === '/admin/venues' || location.pathname === '/venues';
-
   return (
-    <nav className="sticky top-0 z-30 flex items-center justify-between w-full h-16 px-8 bg-white border-b border-slate-100 shadow-sm transition-all duration-200">
-      <div className="flex items-center flex-1">
-        {showSearch && (
-        <div className="relative w-full max-w-lg group animate-fade-in">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none group-focus-within:text-blue-600 text-slate-400">
-            <Search className="w-4 h-4 transition-colors" />
-          </span>
-          <input
-            type="text"
-            className="w-full py-2 pl-11 pr-4 bg-slate-50 border border-slate-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm group-hover:bg-slate-100/50"
-            placeholder="Search venues, bookings or help..."
-          />
-        </div>
-        )}
-      </div>
-
+    <nav className="sticky top-0 z-30 flex items-center justify-end w-full h-16 px-8 bg-white border-b border-slate-100 shadow-sm transition-all duration-200">
       <div className="flex items-center space-x-6">
         <NotificationTray />
         

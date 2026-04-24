@@ -16,6 +16,18 @@ const bookingSchema = new mongoose.Schema({
   },
   approvedByHod: { type: Boolean, default: false },
   approvedByDsw: { type: Boolean, default: false },
+
+  // ─── Snapshot fields ─────────────────────────────────────────────────────────
+  // These are written at booking creation time so that logs remain readable
+  // even if the related User, Venue, or Department is later deleted.
+  snapshot: {
+    userName:       { type: String, default: '' },
+    userEmail:      { type: String, default: '' },
+    venueName:      { type: String, default: '' },
+    venueType:      { type: String, default: '' },  // 'central' | 'departmental'
+    departmentName: { type: String, default: '' },  // empty string for central venues
+    departmentId:   { type: mongoose.Schema.Types.ObjectId, default: null },
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema);

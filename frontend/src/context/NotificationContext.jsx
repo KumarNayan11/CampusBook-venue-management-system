@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getNotifications } from '../services/notificationService';
+import { getNotifications, markAsRead as apiMarkAsRead, markAllRead as apiMarkAllRead } from '../services/notificationService';
 import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
@@ -46,14 +46,28 @@ export const NotificationProvider = ({ children }) => {
     };
   }, [user]);
 
-  // Method to manually update state after reading
-  const markAsReadLocally = (id) => {
-    setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
-    setUnreadCount(prev => Math.max(0, prev - 1));
+  const markAsRead = async (id) => {
+    try {
+      await apiMarkAsRead(id);
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await apiMarkAllRead();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, fetchNotifications, markAsReadLocally }}>
+    <NotificationContext.Provider value={{ notifications, unreadCount, fetchNotifications, markAsRead, markAllRead }}>
       {children}
     </NotificationContext.Provider>
   );

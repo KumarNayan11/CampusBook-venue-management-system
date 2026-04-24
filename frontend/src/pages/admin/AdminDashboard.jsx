@@ -3,11 +3,11 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell 
 } from 'recharts';
-import { exportToCsv } from '../../utils/exportCsv';
+
 import toast from 'react-hot-toast';
 import { 
   Users, Calendar, MapPin, CheckCircle, TrendingUp, AlertCircle, Clock, 
-  RefreshCw, Loader2, FileSpreadsheet, ChevronDown
+  RefreshCw, Loader2, ChevronDown
 } from 'lucide-react';
 import { getUsers } from '../../services/userService';
 import { getVenues } from '../../services/venueService';
@@ -42,12 +42,15 @@ const AdminDashboard = () => {
       
       const uCount = users?.length || 0;
       const vCount = venues?.length || 0;
-      const bCount = bookings?.length || 0;
-      const pCount = bookings?.filter(b => b?.status?.includes('pending'))?.length || 0;
+      
+      const totalLogs = bookings?.length || 0;
+      const activeBookings = bookings?.filter(b => b.status !== 'withdrawn') || [];
+      const bCount = activeBookings.length;
+      const pCount = activeBookings.filter(b => b?.status?.includes('pending'))?.length || 0;
       
       let rate = '0%';
       if (bCount > 0) {
-         const approvedCount = bookings.filter(b => b?.status === "approved").length;
+         const approvedCount = activeBookings.filter(b => b?.status === "approved").length;
          rate = `${Math.round((approvedCount / bCount) * 100)}%`;
       }
 
@@ -55,6 +58,7 @@ const AdminDashboard = () => {
         totalUsers: uCount, 
         activeVenues: vCount,
         totalBookings: bCount,
+        totalLogs: totalLogs,
         pendingBookings: pCount,
         approvedRate: rate
       });
@@ -67,10 +71,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleExport = () => {
-    exportToCsv('system_audit_report.csv', [stats]);
-    toast.success('System Audit Exported');
-  };
+
 
   if (loading) return (
     <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
@@ -82,7 +83,7 @@ const AdminDashboard = () => {
   const statCards = [
     { label: 'Platform Users', value: stats.totalUsers, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', path: '/admin/users' },
     { label: 'Capacity (Venues)', value: stats.activeVenues, icon: MapPin, color: 'text-indigo-600', bg: 'bg-indigo-50', path: '/admin/venues' },
-    { label: 'Total Logs', value: stats.totalBookings, icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50', path: '/logs' },
+    { label: 'Total Logs', value: stats.totalLogs, icon: Calendar, color: 'text-purple-600', bg: 'bg-purple-50', path: '/logs' },
     { label: 'Oversight Rate', value: stats.approvedRate, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', path: '#' },
   ];
 
@@ -110,13 +111,7 @@ const AdminDashboard = () => {
           >
              <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : 'group-hover/refresh:rotate-180'} transition-transform duration-500`} />
           </button>
-          <button 
-             onClick={handleExport}
-             className="px-6 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-xl active:scale-95 flex items-center text-xs uppercase tracking-widest italic"
-          >
-             <FileSpreadsheet className="w-4 h-4 mr-2" />
-             Export Audit
-          </button>
+
         </div>
       </header>
 
@@ -134,10 +129,7 @@ const AdminDashboard = () => {
                 <div>
                   <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-2 italic">{stat.label}</p>
                   <h3 className="text-3xl font-extrabold text-slate-900 tracking-tighter">{stat.value}</h3>
-                  <div className="mt-3 flex items-center text-[10px] font-extrabold text-emerald-500 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                    +12.5%
-                  </div>
+
                 </div>
                 <div className={`p-5 rounded-3xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform duration-500 shadow-lg shadow-current/10 border border-current/10`}>
                   <Icon className="w-7 h-7" />

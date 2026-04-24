@@ -18,17 +18,20 @@ exports.register = asyncHandler(async (req, res) => {
     throw new Error('User already exists');
   }
 
+  // HODs are NEVER assigned a department at signup.
+  // Department → HOD relationships are managed exclusively by Admin.
+  // Faculty can optionally link to an EXISTING department at signup.
+  // We don't auto-create departments here to prevent duplicates/typos.
   let resolvedDeptId = null;
-  if ((role === 'hod' || role === 'faculty') && department) {
+  if (role === 'faculty' && department) {
     const deptName = department.trim();
-    let dept = await Department.findOne({ 
+    const dept = await Department.findOne({ 
       name: { $regex: new RegExp(`^${deptName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } 
     });
     
-    if (!dept) {
-      dept = await Department.create({ name: deptName });
+    if (dept) {
+      resolvedDeptId = dept._id;
     }
-    resolvedDeptId = dept._id;
   }
 
   const user = await User.create({

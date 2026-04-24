@@ -293,7 +293,7 @@ const Home = () => {
                   © 2026 MITS Gwalior CampusBook - Facility Booking System
                </p>
                <p className="text-[13px] font-semibold text-slate-400">
-                  Made by <span className="text-blue-900 font-bold">Nayan Jain</span> & <span className="text-blue-900 font-bold">Rashi Jain</span>
+                  Made by <span className="text-blue-900 font-bold">Nayan Jain</span>
                </p>
             </div>
          </footer>

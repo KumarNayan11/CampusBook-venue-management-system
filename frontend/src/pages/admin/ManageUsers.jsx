@@ -272,8 +272,14 @@ const ManageUsers = () => {
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-6 py-7 font-extrabold text-slate-400 text-[10px] uppercase tracking-widest italic">
-                     {user.departmentId?.name || 'CENTRAL OVERSIGHT'}
+                  <td className="px-6 py-7 font-extrabold text-[10px] uppercase tracking-widest italic">
+                    {user.departmentId?.name ? (
+                      <span className="text-slate-700">{user.departmentId.name}</span>
+                    ) : user.role === 'hod' ? (
+                      <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-100 text-[9px]">Unassigned</span>
+                    ) : (
+                      <span className="text-slate-300">—</span>
+                    )}
                   </td>
                   <td className="px-6 py-7">
                     <div className="flex items-center text-xs font-bold text-slate-400 tracking-tight gap-2 italic">

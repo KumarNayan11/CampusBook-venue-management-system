@@ -22,6 +22,7 @@ import MyBookings from './pages/faculty/MyBookings';
 import Approvals from './pages/Approvals';
 import ManageUsers from './pages/admin/ManageUsers';
 import ManageVenues from './pages/admin/ManageVenues';
+import ManageDepartments from './pages/admin/ManageDepartments';
 
 // Redirects to login if no user is set
 const ProtectedRoute = ({ children, roles }) => {
@@ -114,6 +115,11 @@ const App = () => {
               <ManageVenues />
             </ProtectedRoute>
           } />
+          <Route path="/admin/departments" element={
+            <ProtectedRoute roles={['admin']}>
+              <ManageDepartments />
+            </ProtectedRoute>
+          } />
 
 
           {/* DSW Routes */}
@@ -144,7 +150,7 @@ const App = () => {
 
           {/* Faculty & Admin Routes for Booking */}
           <Route path="/book-venue" element={
-            <ProtectedRoute roles={['faculty', 'admin', 'hod']}>
+            <ProtectedRoute roles={['faculty', 'hod']}>
               <BookVenue />
             </ProtectedRoute>
           } />

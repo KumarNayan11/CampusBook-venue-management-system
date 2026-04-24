@@ -5,15 +5,16 @@ import { getAllBookings } from '../services/bookingService';
 import useApi from '../hooks/useApi';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { formatDateLocal } from '../utils/dateUtils';
 
 const ViewTimetable = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const isAuthorized = user?.role === 'faculty' || user?.role === 'admin';
+    const isAuthorized = user?.role === 'faculty' || user?.role === 'hod';
     const [viewMode, setViewMode] = useState('weekly'); // 'weekly' or 'daily'
     const [venues, setVenues] = useState([]);
     const [selectedVenue, setSelectedVenue] = useState(null);
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(formatDateLocal(new Date()));
     const [bookings, setBookings] = useState([]);
     const [weekDates, setWeekDates] = useState([]);
 
@@ -21,6 +22,16 @@ const ViewTimetable = () => {
     const { loading: loadingBookings, request: requestBookings } = useApi();
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+        const now = new Date();
+        const dayOfWeek = now.getDay() || 7; 
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - dayOfWeek + 1);
+        monday.setHours(0, 0, 0, 0);
+        return monday;
+    });
+
     const getDynamicTimeSlots = () => {
         let start = 8; // 08:00
         let end = 17;  // 17:00
@@ -66,12 +77,9 @@ const ViewTimetable = () => {
             if (viewMode === 'weekly') {
                 if (!selectedVenue) return;
 
-                const now = new Date();
-                const dayOfWeek = now.getDay() || 7; // 1=Mon...7=Sun
-                const monday = new Date(now);
-                monday.setDate(now.getDate() - dayOfWeek + 1);
-                const saturday = new Date(now);
-                saturday.setDate(now.getDate() - dayOfWeek + 6);
+                const monday = new Date(currentWeekStart);
+                const saturday = new Date(monday);
+                saturday.setDate(monday.getDate() + 5);
 
                 const dates = [];
                 for (let i = 0; i < 6; i++) {
@@ -80,15 +88,15 @@ const ViewTimetable = () => {
                     dates.push({
                         dayName: days[i],
                         label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        fullDate: d.toISOString().split('T')[0]
+                        fullDate: formatDateLocal(d)
                     });
                 }
                 setWeekDates(dates);
 
                 params = {
                     venueId: selectedVenue._id,
-                    startDate: monday.toISOString().split('T')[0],
-                    endDate: saturday.toISOString().split('T')[0]
+                    startDate: formatDateLocal(monday),
+                    endDate: formatDateLocal(saturday)
                 };
             } else {
                 if (!selectedDate) return;
@@ -106,18 +114,24 @@ const ViewTimetable = () => {
 
     useEffect(() => {
         fetchBookings();
-    }, [viewMode, selectedVenue, selectedDate]);
+    }, [viewMode, selectedVenue, selectedDate, currentWeekStart]);
+
+    const navigateWeek = (direction) => {
+        const newStart = new Date(currentWeekStart);
+        newStart.setDate(currentWeekStart.getDate() + (direction * 7));
+        setCurrentWeekStart(newStart);
+    };
 
     // Helpers for Weekly View rendering
-    const getBookingForSlot = (dayName, timeLabel) => {
+    const getBookingForSlot = (targetDate, timeLabel) => {
         if (!Array.isArray(bookings)) return undefined;
         return bookings.find(entry => {
             if (!entry || !entry.date) return false;
 
-            // Map booking date to weekday, forcing UTC evaluation to prevent timezone drift
-            const bookingDate = new Date(entry.date);
-            const bookingDayName = bookingDate.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
-            if (bookingDayName !== dayName) return false;
+            // Accurate date matching using YYYY-MM-DD
+            // Use local date parts to avoid UTC shifting
+            const entryDateStr = formatDateLocal(entry.date);
+            if (entryDateStr !== targetDate) return false;
 
             const parseTime = (tString) => {
                 const [timePart, modifier] = (tString || '').split(' ');
@@ -230,8 +244,25 @@ const ViewTimetable = () => {
                                 <option key={v._id} value={v._id}>{v.name}</option>
                             ))}
                         </select>
-                        <div className="ml-auto mr-4 flex items-center px-5 py-2.5 bg-blue-50/50 border border-blue-100/50 text-blue-600 rounded-lg text-[10px] font-extrabold uppercase tracking-widest italic shadow-inner">
-                            <Clock className="w-3.5 h-3.5 mr-2" /> Current Week Bound
+                        <div className="ml-auto flex items-center gap-2">
+                            <button 
+                                onClick={() => navigateWeek(-1)}
+                                className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors border border-blue-100 bg-white shadow-sm"
+                                title="Previous Week"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-center px-4 py-2 bg-blue-50/50 border border-blue-100/50 text-blue-600 rounded-lg text-[10px] font-extrabold uppercase tracking-widest italic shadow-inner">
+                                <Clock className="w-3.5 h-3.5 mr-2" /> 
+                                {weekDates[0]?.label} - {weekDates[5]?.label}
+                            </div>
+                            <button 
+                                onClick={() => navigateWeek(1)}
+                                className="p-2 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors border border-blue-100 bg-white shadow-sm"
+                                title="Next Week"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 ) : (
@@ -284,7 +315,7 @@ const ViewTimetable = () => {
                                             </div>
                                         </td>
                                         {weekDates.map(wd => {
-                                            const booking = getBookingForSlot(wd.dayName, time);
+                                            const booking = getBookingForSlot(wd.fullDate, time);
                                             return (
                                                 <td key={`${wd.dayName}-${time}`} className="p-3 border border-slate-50 relative h-28 transition-colors hover:bg-blue-50/20">
                                                     {booking ? (

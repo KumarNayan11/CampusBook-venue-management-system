@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle, XCircle, Clock, MoreVertical, MapPin, Calendar, User, Eye, Trash2, Undo2, Ban } from 'lucide-react';
 
-const BookingTable = ({ bookings = [], onView, onDelete, onWithdraw }) => {
+const BookingTable = ({ bookings = [], onView, onDelete, onWithdraw, hideApplicant = false }) => {
   const getStatusStyle = (status) => {
     const s = status?.toLowerCase() || '';
     if (s.includes('approved')) return 'bg-emerald-50 text-emerald-600 border-emerald-100 ring-emerald-500/20';
@@ -56,7 +56,9 @@ const BookingTable = ({ bookings = [], onView, onDelete, onWithdraw }) => {
           <thead>
             <tr className="bg-slate-50/50">
               <th className="px-8 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic">Venue & Session</th>
-              <th className="px-6 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic">Applicant</th>
+              {!hideApplicant && (
+                <th className="px-6 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic">Applicant</th>
+              )}
               <th className="px-6 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest italic">Department</th>
               <th className="px-6 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest text-center italic">Status</th>
               <th className="px-8 py-5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest text-right italic">Action Suite</th>
@@ -79,7 +81,9 @@ const BookingTable = ({ bookings = [], onView, onDelete, onWithdraw }) => {
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-6 font-bold text-slate-700 text-sm italic">{booking.applicant}</td>
+                {!hideApplicant && (
+                  <td className="px-6 py-6 font-bold text-slate-700 text-sm italic">{booking.applicant}</td>
+                )}
                 <td className="px-6 py-6 font-bold text-slate-400 text-xs tracking-widest uppercase italic">{booking.dept}</td>
                 <td className="px-6 py-6 text-center">
                   <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-extrabold uppercase tracking-widest border transition-all duration-500 transform hover:scale-105 hover:ring-2 ${getStatusStyle(booking.status)} shadow-sm`}>

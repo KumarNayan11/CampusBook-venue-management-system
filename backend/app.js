@@ -42,7 +42,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const venueRoutes = require('./routes/venueRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
-const timetableRoutes = require('./routes/timetableRoutes');
+
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
@@ -52,7 +52,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/venues', venueRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/timetable', timetableRoutes);
+
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/notifications', notificationRoutes);

@@ -22,7 +22,7 @@ const Layout = ({ children }) => {
         <main className="flex-1 w-full px-10 py-10 max-w-7xl mx-auto animate-fade-in transition-all">
           {children}
         </main>
-        
+
         <footer className="mt-auto px-10 py-6 border-t border-slate-100 bg-white">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-widest">
             <span>&copy; 2026 CampusBook Analytics & Management</span>
@@ -31,7 +31,7 @@ const Layout = ({ children }) => {
               <a href="#" className="hover:text-blue-600 transition-colors">Help Center</a>
               <a href="#" className="hover:text-blue-600 transition-colors">API Status</a>
               <a
-                href="https://github.com/rashijain2025/CampusBook"
+                href="https://github.com/KumarNayan11/CampusBook-venue-management-system"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ml-3 opacity-80 hover:opacity-100 hover:text-blue-600 transition-colors"

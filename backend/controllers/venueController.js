@@ -27,10 +27,15 @@ exports.createVenue = asyncHandler(async (req, res) => {
     booking_close_time,
   } = req.body;
 
+  if (type === 'departmental' && !departmentId) {
+    res.status(400);
+    throw new Error('Departmental venues must be associated with a department');
+  }
+
   const venue = await Venue.create({
     name,
     type,
-    departmentId: departmentId || null,
+    departmentId: type === 'central' ? null : (departmentId || null),
     capacity,
     location,
     image,
