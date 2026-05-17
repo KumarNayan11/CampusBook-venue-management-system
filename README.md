@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://campusbook2026.vercel.app/favicon.ico" width="64" alt="CampusBook Logo" />
+<img src="docs/screenshots/favicon.png" width="64" alt="CampusBook Logo" />
 
 # CampusBook
-### Campus Venue Booking & Utilization System
+### Campus Facility Booking & Analytics System
 
 *A centralized, conflict-free facility management platform built for educational institutions.*
 
@@ -38,13 +38,15 @@ Built on the **MERN stack**, deployed on **Vercel + MongoDB Atlas**, and designe
 
 | Landing Page | Faculty Dashboard |
 |---|---|
-| ![Landing](https://campusbook2026.vercel.app/og-landing.png) | ![Faculty Dashboard](https://campusbook2026.vercel.app/og-faculty.png) |
+| ![Landing](docs/screenshots/landing-page.png) | ![Faculty Dashboard](docs/screenshots/faculty-dashboard.png) |
 
 | HOD Approval Panel | Analytics Dashboard |
 |---|---|
-| ![HOD Panel](https://campusbook2026.vercel.app/og-hod.png) | ![Analytics](https://campusbook2026.vercel.app/og-analytics.png) |
+| ![HOD Panel](docs/screenshots/hod-panel.png) | ![Analytics](docs/screenshots/analytics-dashboard.png) |
 
-> Live screenshots available at the [deployed app](https://campusbook2026.vercel.app/).
+| Timetable Page | Manage Venues Page |
+|---|---|
+| ![Timetable](docs/screenshots/timetable-page.png) | ![Manage Venues](docs/screenshots/manage-venues-page.png) |
 
 ---
 
