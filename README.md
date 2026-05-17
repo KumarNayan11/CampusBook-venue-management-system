@@ -174,7 +174,9 @@ VITE_API_URL=/api
 npm run seed
 ```
 
-This populates the database with demo users, departments, and venues so you can explore the system immediately.
+This populates your **local** database with demo users, departments, and venues.
+
+> The live production database is read-only. To explore all features without a local setup, use the [demo credentials on the live deployment](#try-the-live-demo) instead.
 
 ### 5. Run in development
 
@@ -271,20 +273,26 @@ The project is configured for **Vercel** deployment out of the box via `vercel.j
 
 **Live deployment:** [https://campusbook2026.vercel.app/](https://campusbook2026.vercel.app/)
 
+> The production database is in **view-only mode**. All dashboards, analytics, and approval panels are explorable via the [demo accounts](#try-the-live-demo), but write operations are disabled on the live instance.
+
 ---
 
-## Demo Credentials
+## Try the Live Demo
 
-After running `npm run seed`, the following accounts are available:
+The production deployment is live and open for exploration. The database is in **read-only / view mode** — write operations are restricted for safety, but all dashboards, workflows, and analytics are fully visible.
+
+👉 **[https://campusbook2026.vercel.app/](https://campusbook2026.vercel.app/)**
+
+Use any of the following demo accounts to log in and explore each role:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@mits.edu | password123 |
-| DSW | dsw@mits.edu | password123 |
-| HOD (CSE) | hod.cse@mits.edu | password123 |
-| Faculty | faculty@mits.edu | password123 |
+| 🛡️ Admin | admin@mits.edu | admin123 |
+| 🎓 DSW (Dean) | dsw@mits.edu | dsw123 |
+| 🏫 HOD (CSE) | hod.cs@mits.edu | hod123 |
+| 👩‍🏫 Faculty | faculty@mits.edu | faculty123 |
 
-> ⚠️ Change all credentials before any production deployment.
+> **Note:** The live database is read-only. To test write operations (creating bookings, approvals, etc.), clone the repo and run it locally with your own MongoDB instance — see [Getting Started](#getting-started).
 
 ---
 
@@ -292,14 +300,13 @@ After running `npm run seed`, the following accounts are available:
 
 Developed as part of **NEC — Software Development 2** at  
 **Madhav Institute of Technology & Science, Gwalior (M.P.), India**
-
-Submitted to: **Mr. Atul Kumar Chauhan**  
+ 
 Session: Jan – June 2026
 
 ---
 
 <div align="center">
 
-Built by **Nayan Jain** (BTIT24O1087) · Information Technology · MITS Gwalior
+Built by **Nayan Jain** · Information Technology · MITS Gwalior
 
 </div>
