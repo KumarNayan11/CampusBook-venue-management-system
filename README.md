@@ -302,13 +302,15 @@ Use any of the following demo accounts to log in and explore each role:
 
 Developed as part of **NEC — Software Development 2** at  
 **Madhav Institute of Technology & Science, Gwalior (M.P.), India**
- 
+
+And inspired from **Macro Project** assigned to TEAM **Para-Dox** which includes - **Nayan Jain** and **Rashi Jain**.
+
 Session: Jan – June 2026
 
 ---
 
 <div align="center">
 
-Built by **Nayan Jain** · Information Technology · MITS Gwalior
+By **Nayan Jain** · Information Technology · MITS Gwalior
 
 </div>
