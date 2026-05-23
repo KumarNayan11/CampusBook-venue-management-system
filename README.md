@@ -303,7 +303,10 @@ Use any of the following demo accounts to log in and explore each role:
 Developed as part of **NEC — Software Development 2** at  
 **Madhav Institute of Technology & Science, Gwalior (M.P.), India**
 
-And inspired from **Macro Project** assigned to TEAM **Para-Dox** which includes - **Nayan Jain** and **Rashi Jain**.
+This repository was developed as part of the **Macro Project** assigned to Team **Para-Dox**, featuring contributions from [**Nayan Jain**][nayan-github] and [**Rashi Jain**][rashi-github].
+<!-- Put these at the very bottom of your README file -->
+[nayan-github]: https://github.com/KumarNayan11
+[rashi-github]: https://github.com/rashijain2025
 
 Session: Jan – June 2026
 
