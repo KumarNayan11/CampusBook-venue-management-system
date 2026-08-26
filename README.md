@@ -8,7 +8,7 @@
 *A centralized, conflict-free facility management platform built for educational institutions.*
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-campusbook2026.vercel.app-4F46E5?style=for-the-badge&logo=vercel&logoColor=white)](https://campusbook2026.vercel.app/)
-[![GitHub](https://img.shields.io/badge/GitHub-KumarNayan11-181717?style=for-the-badge&logo=github)](https://github.com/KumarNayan11/CampusBook-venue-management-system)
+[![GitHub](https://img.shields.io/badge/GitHub-nayanj616-181717?style=for-the-badge&logo=github)](https://github.com/nayanj616/CampusBook-venue-management-system)
 [![License](https://img.shields.io/badge/License-ISC-green?style=for-the-badge)](LICENSE)
 
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
@@ -140,7 +140,7 @@ The system uses **MongoDB** with 7 collections:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/KumarNayan11/CampusBook-venue-management-system.git
+git clone https://github.com/nayanj616/CampusBook-venue-management-system.git
 cd CampusBook-venue-management-system
 ```
 
@@ -305,7 +305,7 @@ Developed as part of **NEC — Software Development 2** at
 
 This repository was developed as part of the **Macro Project** assigned to Team **Para-Dox**, featuring contributions from [**Nayan Jain**][nayan-github] and [**Rashi Jain**][rashi-github].
 <!-- Put these at the very bottom of your README file -->
-[nayan-github]: https://github.com/KumarNayan11
+[nayan-github]: https://github.com/nayanj616
 [rashi-github]: https://github.com/rashijain2025
 
 Session: Jan – June 2026
